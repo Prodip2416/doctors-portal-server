@@ -21,30 +21,30 @@ app.get('/', (req, res) => {
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
     const appointmentCollection = client.db(process.env.DB_NAME).collection("appointments");
-    console.log('database connection');
-    // app.post('/addAppointment', (req, res) => {
-    //     const appointment = req.body;
-    //     appointmentCollection.insertOne(appointment)
-    //         .then(result => {
-    //             res.send(result.insertedCount > 0)
-    //         })
-    // });
+    
+    app.post('/addAppointment', (req, res) => {
+        const appointment = req.body;
+        appointmentCollection.insertOne(appointment)
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
+    });
 
-    // app.get('/appointments', (req, res) => {
-    //     appointmentCollection.find({})
-    //         .toArray((err, documents) => {
-    //             res.send(documents);
-    //         })
-    // })
+    app.get('/appointments', (req, res) => {
+        appointmentCollection.find({})
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
+    })
 
-    // app.post('/appointmentsByDate', (req, res) => {
-    //     const date = req.body;
-    //     console.log(date.date);
-    //     appointmentCollection.find({ date: date.date })
-    //         .toArray((err, documents) => {
-    //             res.send(documents);
-    //         })
-    // })
+    app.post('/appointmentsByDate', (req, res) => {
+        const date = req.body;
+        console.log(date.date);
+        appointmentCollection.find({ date: date.date })
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
+    })
 
 
 });
