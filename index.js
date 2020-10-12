@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fileUpload = require('express-fileupload')
+const fileUpload = require('express-fileupload');
+// const fs = require('fs-extra');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
@@ -64,21 +65,41 @@ client.connect(err => {
     })
 
     app.post('/addDoctor', (req, res) => {
+        // Save Folder on this project
+        // const file = req.files.file;
+        // const name = req.body.name;
+        // const email = req.body.email;
+
+        // file.mv(`${__dirname}/doctors/${file.name}`, err => {
+        //     if (err) {
+        //         console.log(err);
+        //         return res.status(500).send({ msg: 'Failed to upload Image' });
+        //     }
+        //     doctorCollection.insertOne({ name, email, img: file.name })
+        //         .then(result => {
+        //             res.send(result.insertedCount > 0)
+        //         })
+        //    // return res.send({name: file.name, path: `/${file.name}`})
+        // })
+
+        // Save Base64 on Mongodb
         const file = req.files.file;
         const name = req.body.name;
         const email = req.body.email;
+        // console.log(file, name, email);
+        const newImg = file.data;
+        const encImg = newImg.toString('base64');
 
-        file.mv(`${__dirname}/doctors/${file.name}`, err => {
-            if (err) {
-                console.log(err);
-                return res.status(500).send({ msg: 'Failed to upload Image' });
-            }
-            doctorCollection.insertOne({ name, email, img: file.name })
-                .then(result => {
-                    res.send(result.insertedCount > 0)
-                })
-           // return res.send({name: file.name, path: `/${file.name}`})
-        })
+        var image = {
+            contentType: req.files.file.mimetype,
+            size: req.files.file.size,
+            img: Buffer.from(encImg, 'base64')
+        };
+
+        doctorCollection.insertOne({ name, email, image })
+            .then(result => {
+                res.send(result.insertedCount > 0);
+            })
     })
 
     app.get('/doctors', (req, res) => {
